@@ -44,5 +44,5 @@ python main.py myVideoName.mp4 en_US
 
 - Q: Any sample vidoes with subtitles?
 - A: Two Youtube channels with many videos:
--- Technology QA Channel: https://www.youtube.com/@TechnologyQA
--- Daily Journal Note Channel: https://www.youtube.com/@DailyJournalNote
+-    Technology QA Channel: https://www.youtube.com/@TechnologyQA
+-    Daily Journal Note Channel: https://www.youtube.com/@DailyJournalNote
