@@ -14,18 +14,17 @@ from pydub.utils import mediainfo
 
 
 def main():
-    # Calculate media info from video
+    # get media info from mp4 video
     channels, bit_rate, sample_rate = video_info(video_path)
 
-    # Convert to audio
+    # Converting to audio
     # audio_filename = timestamp + "_audio.wav"
     audio_filename = timestamp + "_audio.mp3"
     audio_filename_flac = timestamp + "_audio.flac"
     blob_name = video_to_audio(video_path, audio_filename, channels, bit_rate, sample_rate, audio_filename_flac)
 
-    # Upload to Google storage
+    # Upload to Google storage to use Google speech-to-text API
     gcs_uri = f"gs://{BUCKET_NAME}/{blob_name}"
-    # gcs_uri = f"gs://media_srt/20230111.flac"
 
     # Transcribe
     response = long_running_recognize(gcs_uri, channels, sample_rate)
@@ -66,12 +65,8 @@ def video_info(video_filepath):
 def video_to_audio(video_filepath, audio_filename, video_channels, video_bit_rate, video_sample_rate,
                    audio_filename_flac):
     """Converts video into audio, and upload the audio to GS"""
-    # ffmpeg -i video.mp4 -f mp3 -ab 192000 -vn music.mp3
-    # command = f"ffmpeg -i {video_filepath} -b:a {video_bit_rate} -ac {video_channels} -ar {video_sample_rate} -vn {audio_filename} "
     command = f"ffmpeg -i {video_filepath}  -b:a {video_bit_rate} -ac {video_channels} -ar {video_sample_rate} -f mp3 -ab 192000 -vn {audio_filename} "
     subprocess.call(command, shell=True)
-    # ffmpeg -i audio.xxx -c:a flac audio.flac
-    # sleep(3)
     command = f"ffmpeg -i {audio_filename} -c:a flac {audio_filename_flac} "
     subprocess.call(command, shell=True)
     blob_name = f"{audio_filename_flac}"
@@ -103,7 +98,6 @@ def long_running_recognize(storage_uri, channels, sample_rate):
 
     print(u"Waiting for operation to complete...")
     response = operation.result(timeout=1000000)
-    # print(response)
 
     json_filename = timestamp + "subtitles.json"
     with open(json_filename, mode="w", encoding="utf-8") as f:
@@ -111,7 +105,6 @@ def long_running_recognize(storage_uri, channels, sample_rate):
 
     subs = []
     for result in response.results:
-        # First alternative is the most probable result
         subs = break_sentences(MAX_CHARS, subs, result.alternatives[0])
 
     print("Transcribing finished")
@@ -127,7 +120,6 @@ def break_sentences(max_chars, subs, alternative):
 
     for w in alternative.words:
         if firstword:
-            # first word in sentence, record start time
             start = w.start_time  # .ToTimedelta()
 
         charcount += len(w.word)
@@ -136,8 +128,6 @@ def break_sentences(max_chars, subs, alternative):
         if ("。" in w.word or "." in w.word or "!" in w.word or "?" in w.word or
                 charcount > max_chars or
                 ("," in w.word and not firstword)):
-            # break sentence at: . ! ? or line length exceeded
-            # also break if , and not first word
             subs.append(srt.Subtitle(index=idx,
                                      start=start,
                                      end=w.end_time,  # .ToTimedelta(),
@@ -155,7 +145,6 @@ def write_srt(subs):
     """Writes SRT file"""
 
     srt_file = timestamp + "subtitles.srt"
-    # print("Writing {} subtitles to: {}".format(LANG, srt_file))
     f = open(srt_file, mode="w", encoding="utf-8")
     content = srt.compose(subs)
     f.writelines(str(content).replace(" ", "").replace("-->", " --> "))
@@ -180,7 +169,6 @@ def move_files_to_output():
     dest = 'C:/Users/Richard/PycharmProjects/srtSubtitle/output'
     files = os.listdir(source)
 
-    #.flac .mp3 .json .srt .txt
     for f in files:
         if (f.endswith(".flac") or f.endswith(".mp3") or f.endswith("subtitles.json") or f.endswith(".srt") or f.endswith(".txt")):
             shutil.move(f, dest)
@@ -190,38 +178,33 @@ def timestamp():
     """Gets current date and time"""
 
     current_datetime = datetime.now()
-    # print("Current date & time : ", current_datetime)
-    # convert datetime obj to string
+
     str_current_datetime = str(current_datetime).replace(" ", "_").replace(":", "_")
     return str_current_datetime
 
 
-# Load configuration from .env file
 load_dotenv()
 BUCKET_NAME = str(os.getenv('BUCKET_NAME'))
 MAX_CHARS = int(os.getenv('MAX_CHARS'))
 FFMPEG_LOCATION = str(os.getenv('FFMPEG_LOCATION'))
 FFPROBE_LOCATION = str(os.getenv('FFPROBE_LOCATION'))
 
-# Load ffmpeg location
 mediainfo.converter = FFMPEG_LOCATION
 mediainfo.ffmpeg = FFMPEG_LOCATION
 mediainfo.ffprobe = FFPROBE_LOCATION
 
-# Take CLI arguments
 if len(argv) != 3:
     print("Missing command-line argument. Usage: python main.py example.wav en-US")
     exit(1)
 video_path = sys.argv[1]
 LANG = sys.argv[2]  # LANG = "en-US"
 
-# Acess GCP credentials
+# Acess Google Clound credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 
-# Get timestamp for filenames
+# Get timestamp for files
 timestamp = timestamp()
 
-# Call the main function
 if __name__ == "__main__":
     main()
 
