@@ -33,7 +33,7 @@ Step 6: Check the output in "./output" folder for the new generated files with T
 usage: main.py [VIDEO_NAME.mp4] [LANGUAGE_CODE]
 Example:
 python main.py myVideoName.mp4 zh_CN
-python main.py myVideoName.mp4 zh_CN
+python main.py myVideoName.mp4 en_US
 
 ```
 
@@ -41,3 +41,8 @@ python main.py myVideoName.mp4 zh_CN
 
 - Q: The format is the srt file does not have punctuation, how to fix it?
 - A: Need to run another Java program to parse and add punctions. This step can be done in Python, but no time to implement in Pyton. Let me know if anyone needs me to do so.
+
+- Q: Any sample vidoes with subtitles?
+- A: Two Youtube channels with many videos:
+-- Technology QA Channel: https://www.youtube.com/@TechnologyQA
+-- Daily Journal Note Channel: https://www.youtube.com/@DailyJournalNote
