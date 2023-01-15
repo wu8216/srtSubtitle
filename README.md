@@ -39,5 +39,5 @@ python main.py myVideoName.mp4 zh_CN
 
 # FAQ
 
-Q: The format is the srt file does not have punctuation, how to fix it?
-A: Need to run another Java program to parse and add punctions. This step can be done in Python, but no time to implement in Pyton. Let me know if anyone needs me to do so.
+- Q: The format is the srt file does not have punctuation, how to fix it?
+- A: Need to run another Java program to parse and add punctions. This step can be done in Python, but no time to implement in Pyton. Let me know if anyone needs me to do so.
