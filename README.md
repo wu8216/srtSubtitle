@@ -46,3 +46,7 @@ python main.py myVideoName.mp4 en_US
 - A: Two Youtube channels with many videos:
 -    Technology QA Channel: https://www.youtube.com/@TechnologyQA
 -    Daily Journal Note Channel: https://www.youtube.com/@DailyJournalNote
+
+# Reference:
+- https://github.com/darshan-majithiya/Generate-SRT-File-using-Google-Cloud-s-Speech-to-Text-API
+- https://github.com/GoogleCloudPlatform/community/blob/master/tutorials/speech2srt/speech2srt.py
